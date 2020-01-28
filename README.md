@@ -2,7 +2,7 @@
 
 ## description
 
-Adds value `lang` and `translations` to WP REST api response for each Post and Page request for site running the Polylang Pro plugin.
+Adds value `polylang_current_lang` and `polylang_translations` to WP REST api response for each Post and Page request for site running the Polylang Pro plugin.
 
 ## Values
 
