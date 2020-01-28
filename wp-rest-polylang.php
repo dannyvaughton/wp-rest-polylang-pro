@@ -53,15 +53,6 @@ class WP_REST_polylang
     public function register_api_field($post_type) {
         register_rest_field(
             $post_type,
-            "polylang_current_lang",
-            array(
-                "get_callback" => array( $this, "get_current_lang" ),
-                "schema" => null
-            )
-        );
-
-        register_rest_field(
-            $post_type,
             "polylang_translations",
             array(
                 "get_callback" => array( $this, "get_translations"  ),
