@@ -9,7 +9,6 @@
  * License: gpl-3.0
  */
 
-
 class WP_REST_polylang
 {
 
@@ -42,30 +41,48 @@ class WP_REST_polylang
         }
 
         $post_types = get_post_types( array( 'public' => true ), 'names' );
+        $taxonomies = get_taxonomies( array( 'public' => true ), 'names' );
 
         foreach( $post_types as $post_type ) {
             if (pll_is_translated_post_type( $post_type )) {
-                self::register_api_field($post_type);
+                self::register_post_api_field($post_type);
+            }
+        }
+
+        foreach( $taxonomies as $taxonomy ) {
+            if (pll_is_translated_taxonomy( $taxonomy )) {
+                self::register_taxonomy_api_field($taxonomy);
             }
         }
     }
 
-    public function register_api_field($post_type) {
+    public function register_post_api_field($post_type) {
         register_rest_field(
             $post_type,
             "polylang_translations",
             array(
-                "get_callback" => array( $this, "get_translations"  ),
+                "get_callback" => array( $this, "get_post_translations"  ),
                 "schema" => null
             )
         );
     }
 
+    public function register_taxonomy_api_field($taxonomy) {
+            register_rest_field(
+                $taxonomy,
+                "polylang_translations",
+                array(
+                    "get_callback" => array( $this, "get_taxonomy_translations"  ),
+                    "schema" => null
+                )
+            );
+        }
+
     public function get_current_lang( $object ) {
         return pll_get_post_language($object['id'], 'locale');
     }
 
-    public function get_translations( $object ) {
+    public function get_post_translations( $object ) {
         $translations = pll_get_post_translations($object['id']);
 
         return array_reduce($translations, function ($carry, $translation) {
@@ -79,6 +96,21 @@ class WP_REST_polylang
             return $carry;
         }, array());
     }
+
+    public function get_taxonomy_translations( $object ) {
+            $translations = pll_get_term_translations($object['id']);
+
+            return array_reduce($translations, function ($carry, $translation) {
+                $item = array(
+                    'locale' => pll_get_post_language($translation, 'locale'),
+                    'id' => $translation
+                );
+
+                array_push($carry, $item);
+
+                return $carry;
+            }, array());
+        }
 }
 
 $WP_REST_polylang = WP_REST_polylang::getInstance();
